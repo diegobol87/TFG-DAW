@@ -385,4 +385,378 @@ pytest tests/test_main.py -v
 
 ---
 
-*GameStore API — TFG-DAW*
+# Frontend — GameStore
+
+## Descripción
+
+El frontend de **GameStore** ha sido desarrollado utilizando **HTML5**, **TailwindCSS** y **JavaScript Vanilla**, priorizando una arquitectura sencilla, visualmente moderna y totalmente compatible con el backend construido en FastAPI.
+
+La aplicación funciona como un cliente web conectado directamente a la API REST del backend mediante `fetch`, utilizando autenticación JWT almacenada en `localStorage`.
+
+El objetivo principal del frontend es ofrecer una experiencia visual moderna inspirada en plataformas gaming actuales, manteniendo una navegación rápida, responsive y desacoplada del backend.
+
+---
+
+# Tecnologías Utilizadas
+
+| Tecnología         | Propósito                               |
+| ------------------ | --------------------------------------- |
+| HTML5              | Estructura semántica                    |
+| TailwindCSS (CDN)  | Diseño responsive y utilidades visuales |
+| JavaScript Vanilla | Lógica frontend y conexión API          |
+| Fetch API          | Comunicación HTTP con FastAPI           |
+| LocalStorage       | Persistencia de JWT y sesión            |
+| Supabase           | Persistencia de datos (Backend)         |
+| FastAPI            | Backend REST conectado al frontend      |
+
+---
+
+# Frontend — GameStore
+
+> Frontend moderno para un e-commerce de videojuegos · HTML5 · TailwindCSS · JavaScript Vanilla · JWT · Fetch API · Responsive Design
+
+---
+
+# Índice
+
+1. [Descripción del Proyecto](#descripción-del-proyecto)
+2. [Stack Tecnológico](#stack-tecnológico)
+3. [Arquitectura Frontend](#arquitectura-frontend)
+4. [Estructura del Proyecto](#estructura-del-proyecto)
+5. [Responsabilidades de las Páginas](#responsabilidades-de-las-páginas)
+6. [Sistema de Autenticación](#sistema-de-autenticación)
+7. [Catálogo Inteligente](#catálogo-inteligente)
+8. [Carrito y Checkout](#carrito-y-checkout)
+9. [Perfil de Usuario](#perfil-de-usuario)
+10. [Panel de Administración](#panel-de-administración)
+11. [Diseño Responsive](#diseño-responsive)
+12. [Comunicación con Backend](#comunicación-con-backend)
+13. [Gestión de JWT](#gestión-de-jwt)
+14. [Experiencia de Usuario (UX)](#experiencia-de-usuario-ux)
+15. [Seguridad Frontend](#seguridad-frontend)
+16. [Ejecución del Frontend](#ejecución-del-frontend)
+17. [Configuración CORS](#configuración-cors)
+18. [Flujo Completo de Compra](#flujo-completo-de-compra)
+19. [Estado Actual del Proyecto](#estado-actual-del-proyecto)
+20. [Futuras Mejoras](#futuras-mejoras)
+
+---
+
+# Descripción del Proyecto
+
+El frontend de **GameStore** ha sido desarrollado utilizando **HTML5**, **TailwindCSS** y **JavaScript Vanilla**, priorizando una arquitectura sencilla, visualmente moderna y totalmente compatible con el backend construido en FastAPI.
+
+La aplicación funciona como un cliente web conectado directamente a la API REST del backend mediante `fetch`, utilizando autenticación JWT almacenada en `localStorage`.
+
+El objetivo principal del frontend es ofrecer una experiencia visual moderna inspirada en plataformas gaming actuales, manteniendo una navegación rápida, responsive y desacoplada del backend.
+
+---
+
+# Stack Tecnológico
+
+| Tecnología         | Propósito                               |
+| ------------------ | --------------------------------------- |
+| HTML5              | Estructura semántica                    |
+| TailwindCSS (CDN)  | Diseño responsive y utilidades visuales |
+| JavaScript Vanilla | Lógica frontend y conexión API          |
+| Fetch API          | Comunicación HTTP con FastAPI           |
+| LocalStorage       | Persistencia de JWT y sesión            |
+| Supabase           | Persistencia de datos (Backend)         |
+| FastAPI            | Backend REST conectado al frontend      |
+
+---
+
+# Arquitectura Frontend
+
+El frontend sigue una estructura desacoplada basada en páginas independientes conectadas mediante peticiones HTTP al backend.
+
+## Flujo General
+
+```text
+Frontend (HTML + JS)
+        ↓
+Fetch API
+        ↓
+FastAPI Backend
+        ↓
+PostgreSQL (Supabase)
+```
+
+---
+
+# Estructura del Proyecto
+
+```bash
+Frontend/
+├── assets/
+│   ├── images/              # Imágenes y placeholders
+│   └── icons/               # Iconos del proyecto
+├── css/
+│   └── style.css            # Estilos globales personalizados
+├── js/
+│   ├── auth.js              # Gestión de autenticación
+│   ├── cart.js              # Funciones del carrito
+│   ├── admin.js             # Dashboard administrativo
+│   └── utils.js             # Helpers y utilidades
+├── index.html               # Página principal
+├── catalogo.html            # Catálogo de videojuegos
+├── producto.html            # Detalle de producto
+├── carrito.html             # Carrito de compra
+├── checkout.html            # Confirmación y pago del pedido
+├── pedidos.html             # Historial de pedidos
+├── perfil.html              # Perfil de usuario
+├── login.html               # Inicio de sesión
+├── register.html            # Registro de usuario
+├── admin.html               # Dashboard administrador
+└── README.md                # Documentación frontend
+```
+
+---
+
+# Responsabilidades de las Páginas
+
+| Página          | Responsabilidad                           |
+| --------------- | ----------------------------------------- |
+| `index.html`    | Landing principal y juegos destacados     |
+| `catalogo.html` | Catálogo completo con filtros y búsqueda  |
+| `producto.html` | Información detallada de un videojuego    |
+| `carrito.html`  | Gestión de productos seleccionados        |
+| `checkout.html` | Confirmación de compra y pasarela de pago |
+| `pedidos.html`  | Historial de compras                      |
+| `perfil.html`   | Perfil y estadísticas del usuario         |
+| `login.html`    | Inicio de sesión JWT                      |
+| `register.html` | Registro de nuevos usuarios               |
+| `admin.html`    | Dashboard analítico administrativo        |
+
+---
+
+# Sistema de Autenticación
+
+El frontend implementa autenticación basada en JWT conectada directamente al backend FastAPI.
+
+## Funcionalidades
+
+* Registro de usuarios
+* Login JWT
+* Persistencia de sesión
+* Protección de páginas privadas
+* Logout seguro
+* Detección automática de sesión
+
+---
+
+# Catálogo Inteligente
+
+El catálogo incluye:
+
+* Búsqueda dinámica
+* Filtros por plataforma
+* Renderizado dinámico desde API
+* Paginación frontend
+* Integración RAWG
+* Tarjetas modernas responsive
+
+---
+
+# Carrito y Checkout
+
+## Funcionalidades del Carrito
+
+* Añadir productos
+* Eliminar juegos
+* Vaciar carrito
+* Persistencia en backend
+* Actualización automática
+
+## Checkout
+
+El sistema de compra incluye:
+
+* Validación de pago
+* Simulación de pasarela
+* Persistencia de pedidos
+* Confirmación visual
+* Reducción automática de stock
+
+---
+
+# Perfil de Usuario
+
+La página de perfil incluye:
+
+* Datos del usuario
+* Estadísticas
+* Número de pedidos
+* Juegos en carrito
+* Acceso admin
+* Modales personalizados
+
+---
+
+# Panel de Administración
+
+El dashboard administrativo incorpora:
+
+* Estadísticas globales
+* Métricas en tiempo real
+* Gestión visual
+* Protección por rol admin
+* Alertas de stock bajo
+
+---
+
+# Diseño Responsive
+
+Todo el frontend ha sido diseñado para:
+
+| Dispositivo | Compatibilidad |
+| ----------- | -------------- |
+| Desktop     | Completa       |
+| Tablet      | Completa       |
+| Mobile      | Completa       |
+
+---
+
+# Comunicación con Backend
+
+La comunicación se realiza mediante `fetch`.
+
+Ejemplo:
+
+```javascript
+const respuesta = await fetch(API_URL, {
+    headers: {
+        "Authorization": `Bearer ${token}`
+    }
+});
+```
+
+---
+
+# Gestión de JWT
+
+El token JWT se almacena en:
+
+```javascript
+localStorage
+```
+
+y se reutiliza automáticamente en las rutas protegidas.
+
+---
+
+# Experiencia de Usuario (UX)
+
+El frontend incorpora:
+
+* Glassmorphism
+* Hover effects
+* Animaciones suaves
+* Modales personalizados
+* Alertas visuales
+* Feedback inmediato
+* Responsive moderno
+* Gradientes gaming
+
+---
+
+# Seguridad Frontend
+
+El frontend implementa:
+
+* Protección visual de rutas
+* Gestión segura de JWT
+* Validaciones
+* Redirecciones automáticas
+* Restricción visual del panel admin
+
+---
+
+# Ejecución del Frontend
+
+## Live Server
+
+```text
+http://127.0.0.1:5500
+```
+
+## Pasos
+
+1. Instalar extensión Live Server
+2. Abrir `index.html`
+3. Ejecutar "Open with Live Server"
+
+---
+
+# Configuración CORS
+
+FastAPI utiliza:
+
+```python
+CORSMiddleware
+```
+
+permitiendo conexiones desde:
+
+```text
+http://127.0.0.1:5500
+http://localhost:5500
+```
+
+---
+
+# Flujo Completo de Compra
+
+```text
+Usuario
+   ↓
+Login JWT
+   ↓
+Catálogo
+   ↓
+Carrito
+   ↓
+Checkout
+   ↓
+Pedido Persistido
+   ↓
+Historial de Pedidos
+```
+
+---
+
+# Estado Actual del Proyecto
+
+## Funcionalidades Completadas
+
+* JWT
+* Login/Register
+* Catálogo dinámico
+* Carrito persistente
+* Checkout funcional
+* Dashboard admin
+* Supabase
+* Responsive design
+* Paginación frontend
+* Soft delete
+* Integración RAWG
+
+---
+
+# Futuras Mejoras
+
+* Stripe real
+* Wishlist
+* Reviews
+* WebSockets
+* React/Vite
+* Docker
+* CI/CD
+* Dark mode
+
+---
+
+# Autor
+
+TFG-DAW — GameStore
+

@@ -61,7 +61,8 @@
 
                 <li>
 
-                    <a href="pedidos.html"
+                    <a href="#"
+                        onclick="verificarLogin(event, 'pedidos.html')"
                         class="nav-link">
 
                         Pedidos
@@ -72,7 +73,8 @@
 
                 <li>
 
-                    <a href="perfil.html"
+                    <a href="#"
+                        onclick="verificarLogin(event, 'perfil.html')"
                         class="nav-link">
 
                         Perfil
@@ -83,7 +85,8 @@
 
                 <li>
 
-                    <a href="carrito.html"
+                    <a href="#"
+                        onclick="verificarLogin(event, 'carrito.html')"
                         class="nav-link">
 
                         Carrito
@@ -453,6 +456,116 @@
                 `;
 
             });
+
+        }
+
+        /* =========================
+           POPUP LOGIN
+        ========================== */
+
+        function verificarLogin(event, destino) {
+
+            event.preventDefault();
+
+            const token =
+                localStorage.getItem("token");
+
+            if (token) {
+
+                window.location.href =
+                    destino;
+
+                return;
+
+            }
+
+            mostrarPopupLogin();
+
+        }
+
+        function mostrarPopupLogin() {
+
+            const popupExistente =
+                document.getElementById("loginPopup");
+
+            if (popupExistente) {
+
+                popupExistente.remove();
+
+            }
+
+            const popup =
+                document.createElement("div");
+
+            popup.id = "loginPopup";
+
+            popup.className =
+                "fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[9999] px-6";
+
+            popup.innerHTML = `
+
+                <div class="bg-slate-900 border border-cyan-500/20 rounded-[2rem] p-10 max-w-md w-full shadow-2xl shadow-cyan-500/20 text-center">
+
+                    <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-5xl shadow-lg shadow-cyan-500/30">
+
+                        🔒
+
+                    </div>
+
+                    <h2 class="text-4xl font-black mb-4 text-white">
+
+                        Inicia sesión
+
+                    </h2>
+
+                    <p class="text-slate-400 text-lg leading-relaxed mb-8">
+
+                        Debes iniciar sesión para acceder a esta sección.
+
+                    </p>
+
+                    <div class="flex gap-4">
+
+                        <button
+                            id="cerrarPopupLogin"
+                            class="flex-1 bg-slate-800 hover:bg-slate-700 transition rounded-2xl py-4 text-lg font-bold">
+
+                            Cancelar
+
+                        </button>
+
+                        <button
+                            id="irLogin"
+                            class="flex-1 bg-gradient-to-r from-cyan-400 to-blue-600 hover:scale-105 transition rounded-2xl py-4 text-lg font-bold text-black shadow-lg shadow-cyan-500/30">
+
+                            Login
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            `;
+
+            document.body.appendChild(popup);
+
+            document
+                .getElementById("cerrarPopupLogin")
+                .addEventListener("click", () => {
+
+                    popup.remove();
+
+                });
+
+            document
+                .getElementById("irLogin")
+                .addEventListener("click", () => {
+
+                    window.location.href =
+                        "login.html";
+
+                });
 
         }
 

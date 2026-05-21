@@ -65,7 +65,8 @@
 
                 <li>
 
-                    <a href="pedidos.html"
+                    <a href="#"
+                        id="linkPedidos"
                         class="nav-link">
 
                         Pedidos
@@ -76,7 +77,8 @@
 
                 <li>
 
-                    <a href="perfil.html"
+                    <a href="#"
+                        id="linkPerfil"
                         class="nav-link">
 
                         Perfil
@@ -87,7 +89,8 @@
 
                 <li>
 
-                    <a href="carrito.html"
+                    <a href="#"
+                        id="linkCarrito"
                         class="nav-link cart-link">
 
                         Carrito
@@ -202,10 +205,43 @@
          GRID JUEGOS
     ========================== -->
 
-    <section class="container-custom pb-24">
+    <section class="container-custom pb-16">
 
         <div id="gridJuegos"
             class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-10">
+
+        </div>
+
+    </section>
+
+    <!-- =========================
+         PAGINACIÓN
+    ========================== -->
+
+    <section class="container-custom pb-24">
+
+        <div class="flex justify-center items-center gap-6 flex-wrap">
+
+            <button id="btnAnterior"
+                class="btn-secondary">
+
+                ← Anterior
+
+            </button>
+
+            <div id="numeroPagina"
+                class="text-white text-xl font-black">
+
+                Página 1
+
+            </div>
+
+            <button id="btnSiguiente"
+                class="btn-primary">
+
+                Siguiente →
+
+            </button>
 
         </div>
 
@@ -269,6 +305,57 @@
     </footer>
 
     <!-- =========================
+         MODAL LOGIN
+    ========================== -->
+
+    <div id="modalLogin"
+        class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50 p-6">
+
+        <div
+            class="bg-slate-900 border border-cyan-500/30 rounded-3xl max-w-md w-full p-8 text-center shadow-2xl shadow-cyan-500/20">
+
+            <div
+                class="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-5xl">
+
+                🔐
+
+            </div>
+
+            <h2 class="text-3xl font-black mb-4 text-white">
+
+                Debes iniciar sesión
+
+            </h2>
+
+            <p class="text-slate-400 text-lg leading-relaxed mb-8">
+
+                Necesitas una cuenta para acceder a esta sección de GameStore.
+
+            </p>
+
+            <div class="flex gap-4 justify-center">
+
+                <button onclick="cerrarModalLogin()"
+                    class="px-6 py-3 rounded-2xl bg-slate-700 hover:bg-slate-600 transition text-white font-bold">
+
+                    Cancelar
+
+                </button>
+
+                <a href="login.html"
+                    class="px-6 py-3 rounded-2xl bg-cyan-500 hover:bg-cyan-400 transition text-black font-black">
+
+                    Iniciar sesión
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- =========================
          SCRIPT
     ========================== -->
 
@@ -294,6 +381,91 @@
 
         const botonesFiltro =
             document.querySelectorAll(".filtro");
+
+        const numeroPagina =
+            document.getElementById("numeroPagina");
+
+        let juegosOriginales = [];
+
+        let filtroActual = "todos";
+
+        let paginaActual = 1;
+
+        const juegosPorPagina = 12;
+
+        /* =========================
+           LOGIN LINKS
+        ========================== */
+
+        function requiereLogin(destino) {
+
+            if (!token) {
+
+                mostrarModalLogin();
+
+                return;
+
+            }
+
+            window.location.href = destino;
+
+        }
+
+        document
+            .getElementById("linkPedidos")
+            .addEventListener("click", (e) => {
+
+                e.preventDefault();
+
+                requiereLogin("pedidos.html");
+
+            });
+
+        document
+            .getElementById("linkPerfil")
+            .addEventListener("click", (e) => {
+
+                e.preventDefault();
+
+                requiereLogin("perfil.html");
+
+            });
+
+        document
+            .getElementById("linkCarrito")
+            .addEventListener("click", (e) => {
+
+                e.preventDefault();
+
+                requiereLogin("carrito.html");
+
+            });
+
+        /* =========================
+           MODAL LOGIN
+        ========================== */
+
+        function mostrarModalLogin() {
+
+            const modal =
+                document.getElementById("modalLogin");
+
+            modal.classList.remove("hidden");
+
+            modal.classList.add("flex");
+
+        }
+
+        function cerrarModalLogin() {
+
+            const modal =
+                document.getElementById("modalLogin");
+
+            modal.classList.remove("flex");
+
+            modal.classList.add("hidden");
+
+        }
 
         /* =========================
            CONTADOR CARRITO
@@ -354,16 +526,18 @@
 
         actualizarContadorCarrito();
 
-        let juegosOriginales = [];
-
-        let filtroActual = "todos";
+        /* =========================
+           CARGAR JUEGOS
+        ========================== */
 
         async function cargarJuegos() {
 
             try {
 
                 const respuesta =
-                    await fetch(API_URL);
+                    await fetch(
+                        `${API_URL}?page=${paginaActual}&size=${juegosPorPagina}`
+                    );
 
                 const juegos =
                     await respuesta.json();
@@ -371,6 +545,9 @@
                 juegosOriginales = juegos;
 
                 mostrarJuegos(juegos);
+
+                numeroPagina.textContent =
+                    `Página ${paginaActual}`;
 
             } catch (error) {
 
@@ -389,6 +566,10 @@
             }
 
         }
+
+        /* =========================
+           MOSTRAR JUEGOS
+        ========================== */
 
         function mostrarJuegos(juegos) {
 
@@ -429,8 +610,6 @@
 
                     <div class="game-card overflow-hidden flex flex-col">
 
-                        <!-- IMAGEN -->
-
                         <div class="overflow-hidden">
 
                             <img src="${imagen}"
@@ -438,8 +617,6 @@
                                 class="w-full h-72 object-cover hover:scale-110 transition duration-500">
 
                         </div>
-
-                        <!-- INFO -->
 
                         <div class="p-7 flex flex-col flex-grow">
 
@@ -483,16 +660,12 @@
 
                                 </div>
 
-                                <div class="flex flex-col gap-4">
+                                <a href="producto.html?id=${juego.id}"
+                                    class="btn-primary w-full text-center">
 
-                                    <a href="producto.html?id=${juego.id}"
-                                        class="btn-primary w-full text-center">
+                                    Ver videojuego
 
-                                        Ver videojuego
-
-                                    </a>
-
-                                </div>
+                                </a>
 
                             </div>
 
@@ -506,11 +679,19 @@
 
         }
 
+        /* =========================
+           BUSCADOR
+        ========================== */
+
         buscador.addEventListener("keyup", () => {
 
             aplicarFiltros();
 
         });
+
+        /* =========================
+           FILTROS
+        ========================== */
 
         botonesFiltro.forEach(boton => {
 
@@ -566,6 +747,38 @@
             mostrarJuegos(juegosFiltrados);
 
         }
+
+        /* =========================
+           PAGINACIÓN
+        ========================== */
+
+        document
+            .getElementById("btnSiguiente")
+            .addEventListener("click", () => {
+
+                paginaActual++;
+
+                cargarJuegos();
+
+            });
+
+        document
+            .getElementById("btnAnterior")
+            .addEventListener("click", () => {
+
+                if (paginaActual > 1) {
+
+                    paginaActual--;
+
+                    cargarJuegos();
+
+                }
+
+            });
+
+        /* =========================
+           INICIAR
+        ========================== */
 
         cargarJuegos();
 

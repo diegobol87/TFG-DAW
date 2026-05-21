@@ -724,24 +724,98 @@
         }
 
         /* =========================
-           LOGOUT
+           LOGOUT MODERNO
         ========================== */
 
         function cerrarSesion() {
 
-            const confirmar =
-                confirm("¿Cerrar sesión?");
+            const popupExistente =
+                document.getElementById("logoutPopup");
 
-            if (!confirmar) return;
+            if (popupExistente) {
 
-            localStorage.removeItem("token");
+                popupExistente.remove();
 
-            localStorage.removeItem("usuario");
+            }
 
-            localStorage.removeItem("carrito");
+            const popup =
+                document.createElement("div");
 
-            window.location.href =
-                "index.html";
+            popup.id = "logoutPopup";
+
+            popup.className =
+                "fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[9999] px-6";
+
+            popup.innerHTML = `
+
+                <div class="bg-slate-900 border border-red-500/20 rounded-[2rem] p-10 max-w-md w-full shadow-2xl shadow-red-500/20 text-center animate-[fadeIn_.25s_ease]">
+
+                    <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-red-500 to-pink-600 flex items-center justify-center text-5xl shadow-lg shadow-red-500/30">
+
+                        ⚠️
+
+                    </div>
+
+                    <h2 class="text-4xl font-black mb-4 text-white">
+
+                        ¿Cerrar sesión?
+
+                    </h2>
+
+                    <p class="text-slate-400 text-lg leading-relaxed mb-8">
+
+                        Tendrás que volver a iniciar sesión para acceder a tu cuenta.
+
+                    </p>
+
+                    <div class="flex gap-4">
+
+                        <button
+                            id="cancelarLogout"
+                            class="flex-1 bg-slate-800 hover:bg-slate-700 transition rounded-2xl py-4 text-lg font-bold">
+
+                            Cancelar
+
+                        </button>
+
+                        <button
+                            id="confirmarLogout"
+                            class="flex-1 bg-gradient-to-r from-red-500 to-pink-600 hover:scale-105 transition rounded-2xl py-4 text-lg font-bold shadow-lg shadow-red-500/30">
+
+                            Salir
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            `;
+
+            document.body.appendChild(popup);
+
+            document
+                .getElementById("cancelarLogout")
+                .addEventListener("click", () => {
+
+                    popup.remove();
+
+                });
+
+            document
+                .getElementById("confirmarLogout")
+                .addEventListener("click", () => {
+
+                    localStorage.removeItem("token");
+
+                    localStorage.removeItem("usuario");
+
+                    localStorage.removeItem("carrito");
+
+                    window.location.href =
+                        "index.html";
+
+                });
 
         }
 
