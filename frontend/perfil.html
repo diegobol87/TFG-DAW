@@ -296,6 +296,37 @@
 
                     </a>
 
+                    <!-- PANEL ADMIN -->
+
+                    <div
+                        id="adminPanelBtn"
+                        onclick="accederPanelAdmin()"
+                        class="profile-action-card cursor-pointer">
+
+                        <div>
+
+                            <h3 class="text-3xl font-black mb-4">
+
+                                Panel de administración
+
+                            </h3>
+
+                            <p class="text-slate-400 text-lg leading-relaxed">
+
+                                Gestiona estadísticas, ingresos, stock y métricas de GameStore.
+
+                            </p>
+
+                        </div>
+
+                        <span class="text-cyan-400 text-3xl">
+
+                            →
+
+                        </span>
+
+                    </div>
+
                 </div>
 
                 <!-- LOGOUT -->
@@ -373,6 +404,48 @@
         </div>
 
     </footer>
+
+    <!-- =========================
+         MODAL ADMIN
+    ========================== -->
+
+    <div
+        id="modalAdmin"
+        class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50 p-6">
+
+        <div
+            class="bg-slate-900 border border-cyan-500/30 rounded-3xl max-w-md w-full p-8 text-center shadow-2xl shadow-cyan-500/20">
+
+            <div
+                class="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-5xl">
+
+                🔒
+
+            </div>
+
+            <h2 class="text-3xl font-black mb-4 text-white">
+
+                Acceso restringido
+
+            </h2>
+
+            <p class="text-slate-400 text-lg leading-relaxed mb-8">
+
+                Debes tener permisos de administrador para acceder al panel de control.
+
+            </p>
+
+            <button
+                onclick="cerrarModalAdmin()"
+                class="px-8 py-4 rounded-2xl bg-cyan-500 hover:bg-cyan-400 transition text-black font-black text-lg">
+
+                Entendido
+
+            </button>
+
+        </div>
+
+    </div>
 
     <!-- =========================
          SCRIPT
@@ -599,6 +672,54 @@
                 juegosCarrito.textContent = 0;
 
             }
+
+        }
+
+        /* =========================
+           ACCESO ADMIN
+        ========================== */
+
+        function accederPanelAdmin() {
+
+            const usuario =
+                JSON.parse(localStorage.getItem("usuario"));
+
+            if (usuario && usuario.is_admin) {
+
+                window.location.href =
+                    "admin.html";
+
+            } else {
+
+                mostrarModalAdmin();
+
+            }
+
+        }
+
+        /* =========================
+           MODAL ADMIN
+        ========================== */
+
+        function mostrarModalAdmin() {
+
+            const modal =
+                document.getElementById("modalAdmin");
+
+            modal.classList.remove("hidden");
+
+            modal.classList.add("flex");
+
+        }
+
+        function cerrarModalAdmin() {
+
+            const modal =
+                document.getElementById("modalAdmin");
+
+            modal.classList.remove("flex");
+
+            modal.classList.add("hidden");
 
         }
 

@@ -7,6 +7,7 @@ from database import get_db
 from Models.user import (
     UserBase,
     UserPublicResponse,
+    UserResponse,
     UserORM
 )
 
@@ -89,7 +90,7 @@ def login(
 
 @router.get(
     "/me",
-    response_model=UserPublicResponse
+    response_model=UserResponse
 )
 def get_me(
     current_user: UserORM = Depends(get_current_user)
@@ -98,5 +99,6 @@ def get_me(
     return {
         "id": current_user.id,
         "username": current_user.username,
-        "email": current_user.email
+        "email": current_user.email,
+        "is_admin": current_user.is_admin
     }

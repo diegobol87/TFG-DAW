@@ -152,6 +152,48 @@
     </main>
 
     <!-- =========================
+         TOAST CARRITO
+    ========================== -->
+
+    <div id="toastCarrito"
+        class="fixed top-32 right-8 z-50 hidden transition-all duration-300">
+
+        <div
+            class="bg-slate-900/95 border border-cyan-500/40 rounded-2xl px-6 py-5 shadow-2xl shadow-cyan-500/20 backdrop-blur-xl min-w-[340px]">
+
+            <div class="flex items-start gap-4">
+
+                <div
+                    class="w-14 h-14 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-2xl shadow-lg">
+
+                    🛒
+
+                </div>
+
+                <div class="flex-1">
+
+                    <h3 class="text-white font-black text-xl mb-1">
+
+                        Juego añadido al carrito
+
+                    </h3>
+
+                    <p id="toastMensaje"
+                        class="text-slate-300 text-sm">
+
+                        El videojuego se añadió correctamente.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- =========================
          FOOTER
     ========================== -->
 
@@ -236,6 +278,12 @@
 
         const contadorCarrito =
             document.getElementById("contadorCarrito");
+
+        const toastCarrito =
+            document.getElementById("toastCarrito");
+
+        const toastMensaje =
+            document.getElementById("toastMensaje");
 
         /* =========================
            TOKEN
@@ -486,7 +534,7 @@
                     <!-- BOTÓN -->
 
                     <button
-                        onclick="agregarAlCarrito(${juego.id})"
+                        onclick="agregarAlCarrito(${juego.id}, '${juego.title.replace(/'/g, "\\'")}')"
                         class="btn-primary w-full text-center text-2xl py-5">
 
                         Añadir al carrito
@@ -500,17 +548,51 @@
         }
 
         /* =========================
+           TOAST
+        ========================== */
+
+        function mostrarToast(mensaje) {
+
+            toastMensaje.textContent =
+                mensaje;
+
+            toastCarrito.classList.remove(
+                "hidden"
+            );
+
+            clearTimeout(
+                toastCarrito.timeout
+            );
+
+            toastCarrito.timeout =
+                setTimeout(() => {
+
+                    toastCarrito.classList.add(
+                        "hidden"
+                    );
+
+                }, 3000);
+
+        }
+
+        /* =========================
            AÑADIR AL CARRITO
         ========================== */
 
-        async function agregarAlCarrito(gameId) {
+        async function agregarAlCarrito(gameId, titulo) {
 
             if (!token) {
 
-                alert("Debes iniciar sesión");
+                mostrarToast(
+                    "Debes iniciar sesión"
+                );
 
-                window.location.href =
-                    "login.html";
+                setTimeout(() => {
+
+                    window.location.href =
+                        "login.html";
+
+                }, 1500);
 
                 return;
 
@@ -556,13 +638,17 @@
 
                 await actualizarContadorCarrito();
 
-                alert("Juego añadido al carrito");
+                mostrarToast(
+                    `"${titulo}" añadido al carrito`
+                );
 
             } catch (error) {
 
                 console.error(error);
 
-                alert(error.message);
+                mostrarToast(
+                    error.message
+                );
 
             }
 
