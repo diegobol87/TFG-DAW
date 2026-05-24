@@ -18,9 +18,17 @@ export default function Admin() {
   const [stats, setStats] = useState(null);
   const [games, setGames] = useState([]);
   const [cartCount, setCartCount] = useState(0);
+
   const [mensaje, setMensaje] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(true);
+
+  const [openSection, setOpenSection] = useState("");
+
+  const [searchEdit, setSearchEdit] = useState("");
+  const [searchDelete, setSearchDelete] = useState("");
+
+  const [editingGame, setEditingGame] = useState(null);
 
   const [newGame, setNewGame] = useState({
     title: "",
@@ -36,6 +44,20 @@ export default function Admin() {
   const [rawgName, setRawgName] = useState("");
 
   const token = localStorage.getItem("token");
+
+  const editResults =
+    searchEdit.trim().length === 0
+      ? []
+      : games.filter((game) =>
+          game.title.toLowerCase().includes(searchEdit.toLowerCase())
+        );
+
+  const deleteResults =
+    searchDelete.trim().length === 0
+      ? []
+      : games.filter((game) =>
+          game.title.toLowerCase().includes(searchDelete.toLowerCase())
+        );
 
   useEffect(() => {
 
@@ -140,6 +162,12 @@ export default function Admin() {
 
   }
 
+  function toggleSection(section) {
+
+    setOpenSection(openSection === section ? "" : section);
+
+  }
+
   async function createGame(e) {
 
     e.preventDefault();
@@ -206,6 +234,61 @@ export default function Admin() {
 
   }
 
+  async function updateGame(e) {
+
+    e.preventDefault();
+
+    try {
+
+      setMensaje("");
+      setSuccess("");
+
+      const body = {
+        title: editingGame.title,
+        genre: editingGame.genre,
+        platform: editingGame.platform,
+        price: Number(editingGame.price),
+        release_year: editingGame.release_year
+          ? Number(editingGame.release_year)
+          : null,
+        multiplayer: editingGame.multiplayer,
+        stock: Number(editingGame.stock),
+        image_url: editingGame.image_url || null
+      };
+
+      const response =
+        await fetch(`${API_GAMES}${editingGame.id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify(body)
+        });
+
+      const data =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.detail || "No se pudo actualizar el juego");
+      }
+
+      setSuccess("Juego actualizado correctamente");
+      setEditingGame(null);
+      setSearchEdit("");
+
+      await loadGames();
+      await loadDashboard();
+
+    } catch (error) {
+
+      console.error(error);
+      setMensaje(error.message);
+
+    }
+
+  }
+
   async function importGame(e) {
 
     e.preventDefault();
@@ -250,10 +333,10 @@ export default function Admin() {
 
   }
 
-  async function deleteGame(gameId) {
+  async function deleteGame(game) {
 
     const confirmDelete =
-      window.confirm("¿Seguro que quieres eliminar este juego del catálogo?");
+      window.confirm(`¿Seguro que quieres eliminar "${game.title}" del catálogo?`);
 
     if (!confirmDelete) return;
 
@@ -263,7 +346,7 @@ export default function Admin() {
       setSuccess("");
 
       const response =
-        await fetch(`${API_GAMES}${gameId}`, {
+        await fetch(`${API_GAMES}${game.id}`, {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${token}`
@@ -278,6 +361,7 @@ export default function Admin() {
       }
 
       setSuccess("Juego eliminado correctamente del catálogo");
+      setSearchDelete("");
 
       await loadGames();
       await loadDashboard();
@@ -291,9 +375,19 @@ export default function Admin() {
 
   }
 
-  function formatMoney(value) {
+  function startEditing(game) {
 
-    return `${Number(value || 0).toFixed(2)}€`;
+    setEditingGame({
+      id: game.id,
+      title: game.title || "",
+      genre: game.genre || "",
+      platform: game.platform || "",
+      price: game.price ?? "",
+      release_year: game.release_year || "",
+      multiplayer: game.multiplayer || false,
+      stock: game.stock ?? "",
+      image_url: game.image_url || ""
+    });
 
   }
 
@@ -303,8 +397,29 @@ export default function Admin() {
 
     setNewGame({
       ...newGame,
-      [name]: type === "checkbox" ? checked : value
+      [name]: type === "checkbox"
+        ? checked
+        : value
     });
+
+  }
+
+  function handleEditChange(e) {
+
+    const { name, value, type, checked } = e.target;
+
+    setEditingGame({
+      ...editingGame,
+      [name]: type === "checkbox"
+        ? checked
+        : value
+    });
+
+  }
+
+  function formatMoney(value) {
+
+    return `${Number(value || 0).toFixed(2)}€`;
 
   }
 
@@ -325,12 +440,28 @@ export default function Admin() {
         </h1>
 
         <p className="text-slate-400 text-lg md:text-xl max-w-3xl mx-auto">
-          Consulta métricas, gestiona juegos, controla stock e importa nuevos títulos.
+          Gestiona estadísticas, juegos, stock e inventario de GameStore.
         </p>
 
       </section>
 
       <main className="max-w-7xl mx-auto px-6 pb-32">
+
+        {mensaje && (
+
+          <div className="bg-red-500/20 border border-red-500/40 text-red-300 rounded-2xl p-5 text-center font-bold mb-8">
+            {mensaje}
+          </div>
+
+        )}
+
+        {success && (
+
+          <div className="bg-green-500/20 border border-green-500/40 text-green-300 rounded-2xl p-5 text-center font-bold mb-8">
+            {success}
+          </div>
+
+        )}
 
         {loading ? (
 
@@ -367,28 +498,28 @@ export default function Admin() {
 
           <>
 
-            {mensaje && (
-
-              <div className="bg-red-500/20 border border-red-500/40 text-red-300 rounded-2xl p-5 text-center font-bold mb-8">
-                {mensaje}
-              </div>
-
-            )}
-
-            {success && (
-
-              <div className="bg-green-500/20 border border-green-500/40 text-green-300 rounded-2xl p-5 text-center font-bold mb-8">
-                {success}
-              </div>
-
-            )}
-
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-12">
 
-              <StatCard title="Usuarios registrados" value={stats.total_users} />
-              <StatCard title="Juegos activos" value={stats.total_games_in_catalog} />
-              <StatCard title="Valor inventario" value={formatMoney(stats.total_inventory_value)} />
-              <StatCard title="Ingresos totales" value={formatMoney(stats.total_earnings)} green />
+              <StatCard
+                title="Usuarios registrados"
+                value={stats.total_users}
+              />
+
+              <StatCard
+                title="Juegos activos"
+                value={stats.total_games_in_catalog}
+              />
+
+              <StatCard
+                title="Valor inventario"
+                value={formatMoney(stats.total_inventory_value)}
+              />
+
+              <StatCard
+                title="Ingresos totales"
+                value={formatMoney(stats.total_earnings)}
+                green
+              />
 
             </div>
 
@@ -483,11 +614,12 @@ export default function Admin() {
 
             </div>
 
-            <section className="bg-slate-900 border border-slate-800 rounded-[2rem] p-8 mb-12">
-
-              <h2 className="text-3xl font-black mb-8">
-                Crear nuevo juego
-              </h2>
+            <AdminAccordion
+              title="Crear nuevo juego"
+              description="Añade un videojuego manualmente al catálogo."
+              isOpen={openSection === "create"}
+              onClick={() => toggleSection("create")}
+            >
 
               <form
                 onSubmit={createGame}
@@ -583,13 +715,14 @@ export default function Admin() {
 
               </form>
 
-            </section>
+            </AdminAccordion>
 
-            <section className="bg-slate-900 border border-slate-800 rounded-[2rem] p-8 mb-12">
-
-              <h2 className="text-3xl font-black mb-8">
-                Importar juego desde RAWG
-              </h2>
+            <AdminAccordion
+              title="Importar juego desde RAWG"
+              description="Busca un título en RAWG y añádelo automáticamente al catálogo."
+              isOpen={openSection === "import"}
+              onClick={() => toggleSection("import")}
+            >
 
               <form
                 onSubmit={importGame}
@@ -613,53 +746,254 @@ export default function Admin() {
 
               </form>
 
-            </section>
+            </AdminAccordion>
 
-            <section className="bg-slate-900 border border-slate-800 rounded-[2rem] p-8">
+            <AdminAccordion
+              title="Editar juego del inventario"
+              description="Busca un juego por nombre y modifica sus datos."
+              isOpen={openSection === "edit"}
+              onClick={() => toggleSection("edit")}
+            >
 
-              <h2 className="text-3xl font-black mb-8">
-                Gestión de juegos
-              </h2>
+              <div className="mb-8">
 
-              <div className="space-y-4">
+                <input
+                  type="text"
+                  value={searchEdit}
+                  onChange={(e) => {
+                    setSearchEdit(e.target.value);
+                    setEditingGame(null);
+                  }}
+                  placeholder="Buscar juego para editar..."
+                  className="w-full bg-slate-950 border border-slate-700 rounded-2xl px-5 py-4 text-white outline-none focus:border-cyan-400"
+                />
 
-                {games.map((game) => (
+              </div>
 
-                  <div
-                    key={game.id}
-                    className="bg-slate-950 border border-slate-800 rounded-2xl p-5 flex flex-col md:flex-row justify-between gap-5"
-                  >
+              {editResults.length > 0 && !editingGame && (
 
-                    <div>
+                <div className="space-y-4 mb-8">
 
-                      <h3 className="text-2xl font-black mb-2">
-                        {game.title}
-                      </h3>
+                  {editResults.map((game) => (
 
-                      <p className="text-slate-400">
-                        {game.genre} · {game.platform}
-                      </p>
+                    <div
+                      key={game.id}
+                      className="bg-slate-950 border border-slate-800 rounded-2xl p-5 flex flex-col md:flex-row justify-between gap-4"
+                    >
 
-                      <p className="text-slate-500">
-                        Stock: {game.stock} · Precio: {formatMoney(game.price)}
-                      </p>
+                      <div>
+
+                        <h3 className="text-2xl font-black">
+                          {game.title}
+                        </h3>
+
+                        <p className="text-slate-400">
+                          {game.genre} · {game.platform}
+                        </p>
+
+                        <p className="text-slate-500">
+                          Stock: {game.stock} · Precio: {formatMoney(game.price)}
+                        </p>
+
+                      </div>
+
+                      <button
+                        onClick={() => startEditing(game)}
+                        className="bg-cyan-400 hover:bg-cyan-300 transition text-black font-black px-6 py-3 rounded-2xl"
+                      >
+                        Editar este juego
+                      </button>
 
                     </div>
 
+                  ))}
+
+                </div>
+
+              )}
+
+              {searchEdit && editResults.length === 0 && (
+
+                <p className="text-slate-400 text-lg">
+                  No se encontraron juegos con ese nombre.
+                </p>
+
+              )}
+
+              {editingGame && (
+
+                <form
+                  onSubmit={updateGame}
+                  className="grid grid-cols-1 md:grid-cols-2 gap-6"
+                >
+
+                  <Input
+                    label="Título"
+                    name="title"
+                    value={editingGame.title}
+                    onChange={handleEditChange}
+                    required
+                  />
+
+                  <Input
+                    label="Género"
+                    name="genre"
+                    value={editingGame.genre}
+                    onChange={handleEditChange}
+                    required
+                  />
+
+                  <Input
+                    label="Plataforma"
+                    name="platform"
+                    value={editingGame.platform}
+                    onChange={handleEditChange}
+                    required
+                  />
+
+                  <Input
+                    label="Precio"
+                    name="price"
+                    type="number"
+                    step="0.01"
+                    value={editingGame.price}
+                    onChange={handleEditChange}
+                    required
+                  />
+
+                  <Input
+                    label="Año de lanzamiento"
+                    name="release_year"
+                    type="number"
+                    value={editingGame.release_year}
+                    onChange={handleEditChange}
+                  />
+
+                  <Input
+                    label="Stock"
+                    name="stock"
+                    type="number"
+                    value={editingGame.stock}
+                    onChange={handleEditChange}
+                    required
+                  />
+
+                  <div className="md:col-span-2">
+
+                    <Input
+                      label="URL de imagen"
+                      name="image_url"
+                      value={editingGame.image_url}
+                      onChange={handleEditChange}
+                    />
+
+                  </div>
+
+                  <label className="flex items-center gap-3 text-slate-300 font-bold">
+
+                    <input
+                      type="checkbox"
+                      name="multiplayer"
+                      checked={editingGame.multiplayer}
+                      onChange={handleEditChange}
+                      className="w-5 h-5"
+                    />
+
+                    Multijugador
+
+                  </label>
+
+                  <div className="flex flex-col md:flex-row gap-4">
+
                     <button
-                      onClick={() => deleteGame(game.id)}
-                      className="bg-red-500/20 border border-red-500/40 hover:bg-red-500/30 transition text-red-300 font-black px-6 py-3 rounded-2xl"
+                      type="submit"
+                      className="bg-cyan-400 hover:bg-cyan-300 transition text-black font-black px-8 py-4 rounded-2xl"
                     >
-                      Eliminar
+                      Guardar cambios
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setEditingGame(null)}
+                      className="bg-slate-800 hover:bg-slate-700 transition px-8 py-4 rounded-2xl font-black"
+                    >
+                      Cancelar
                     </button>
 
                   </div>
 
-                ))}
+                </form>
 
-              </div>
+              )}
 
-            </section>
+            </AdminAccordion>
+
+            <AdminAccordion
+              title="Borrar juego del inventario"
+              description="Busca un juego por nombre antes de eliminarlo del catálogo."
+              isOpen={openSection === "delete"}
+              onClick={() => toggleSection("delete")}
+            >
+
+              <input
+                type="text"
+                value={searchDelete}
+                onChange={(e) => setSearchDelete(e.target.value)}
+                placeholder="Buscar juego para borrar..."
+                className="w-full bg-slate-950 border border-slate-700 rounded-2xl px-5 py-4 text-white outline-none focus:border-cyan-400 mb-8"
+              />
+
+              {deleteResults.length > 0 && (
+
+                <div className="space-y-4">
+
+                  {deleteResults.map((game) => (
+
+                    <div
+                      key={game.id}
+                      className="bg-slate-950 border border-slate-800 rounded-2xl p-5 flex flex-col md:flex-row justify-between gap-4"
+                    >
+
+                      <div>
+
+                        <h3 className="text-2xl font-black">
+                          {game.title}
+                        </h3>
+
+                        <p className="text-slate-400">
+                          {game.genre} · {game.platform}
+                        </p>
+
+                        <p className="text-slate-500">
+                          Stock: {game.stock} · Precio: {formatMoney(game.price)}
+                        </p>
+
+                      </div>
+
+                      <button
+                        onClick={() => deleteGame(game)}
+                        className="bg-red-500/20 border border-red-500/40 hover:bg-red-500/30 transition text-red-300 font-black px-6 py-3 rounded-2xl"
+                      >
+                        Eliminar
+                      </button>
+
+                    </div>
+
+                  ))}
+
+                </div>
+
+              )}
+
+              {searchDelete && deleteResults.length === 0 && (
+
+                <p className="text-slate-400 text-lg">
+                  No se encontraron juegos con ese nombre.
+                </p>
+
+              )}
+
+            </AdminAccordion>
 
           </>
 
@@ -726,6 +1060,49 @@ function MetricBar({ label, value, max }) {
       </div>
 
     </div>
+
+  );
+
+}
+
+function AdminAccordion({ title, description, isOpen, onClick, children }) {
+
+  return (
+
+    <section className="bg-slate-900 border border-slate-800 rounded-[2rem] mb-8 overflow-hidden">
+
+      <button
+        onClick={onClick}
+        className="w-full p-8 text-left flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-slate-800/40 transition"
+      >
+
+        <div>
+
+          <h2 className="text-3xl font-black mb-2">
+            {title}
+          </h2>
+
+          <p className="text-slate-400 text-lg">
+            {description}
+          </p>
+
+        </div>
+
+        <span className="text-cyan-400 text-4xl font-black">
+          {isOpen ? "−" : "+"}
+        </span>
+
+      </button>
+
+      {isOpen && (
+
+        <div className="px-8 pb-8">
+          {children}
+        </div>
+
+      )}
+
+    </section>
 
   );
 
