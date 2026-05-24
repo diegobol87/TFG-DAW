@@ -66,6 +66,7 @@ export default function Pedidos() {
     try {
 
       setLoading(true);
+      setMensaje("");
 
       const response =
         await fetch(API_ORDERS, {
@@ -133,11 +134,11 @@ export default function Pedidos() {
           MIS PEDIDOS
         </span>
 
-        <h1 className="text-6xl font-black mt-6 mb-6">
+        <h1 className="text-5xl md:text-6xl font-black mt-6 mb-6">
           Historial de compras
         </h1>
 
-        <p className="text-slate-400 text-xl max-w-3xl mx-auto">
+        <p className="text-slate-400 text-lg md:text-xl max-w-3xl mx-auto">
           Consulta tus pedidos realizados y revisa los videojuegos comprados.
         </p>
 
@@ -163,7 +164,7 @@ export default function Pedidos() {
 
           <div className="bg-slate-900 border border-slate-800 rounded-[2rem] p-14 text-center">
 
-            <h2 className="text-5xl font-black mb-6">
+            <h2 className="text-4xl md:text-5xl font-black mb-6">
               Todavía no tienes pedidos
             </h2>
 
@@ -221,29 +222,30 @@ export default function Pedidos() {
 
                 <div className="space-y-5">
 
-                  {(order.items || []).map((item) => {
+                  {(order.items || []).map((item, index) => {
 
-                    const game =
-                      item.game || {};
+                    const title =
+                      item.game_title || `Videojuego #${item.game_id}`;
 
                     const price =
-                      item.price_at_purchase ??
-                      item.price_at_order ??
-                      game.price ??
-                      0;
+                      item.price_at_purchase || 0;
 
                     return (
 
                       <div
-                        key={item.id}
+                        key={`${order.id}-${item.game_id}-${index}`}
                         className="bg-slate-950 border border-slate-800 rounded-3xl p-6 flex flex-col md:flex-row justify-between gap-6"
                       >
 
                         <div>
 
                           <h3 className="text-3xl font-black mb-2">
-                            {game.title || "Videojuego"}
+                            {title}
                           </h3>
+
+                          <p className="text-slate-400">
+                            ID del juego: {item.game_id}
+                          </p>
 
                           <p className="text-slate-400">
                             Cantidad: {item.quantity}

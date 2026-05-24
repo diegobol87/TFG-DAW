@@ -18,7 +18,6 @@ export default function Perfil() {
   const [user, setUser] = useState(null);
   const [ordersCount, setOrdersCount] = useState(0);
   const [cartCount, setCartCount] = useState(0);
-  const [modalAdmin, setModalAdmin] = useState(false);
   const [modalLogout, setModalLogout] = useState(false);
 
   const token = localStorage.getItem("token");
@@ -130,16 +129,6 @@ export default function Perfil() {
 
   }
 
-  function accessAdmin() {
-
-    if (user?.is_admin) {
-      navigate("/admin");
-    } else {
-      setModalAdmin(true);
-    }
-
-  }
-
   function logout() {
 
     localStorage.removeItem("token");
@@ -167,11 +156,11 @@ export default function Perfil() {
           MI CUENTA
         </span>
 
-        <h1 className="text-6xl font-black mt-6 mb-6">
+        <h1 className="text-5xl md:text-6xl font-black mt-6 mb-6">
           Tu perfil gamer
         </h1>
 
-        <p className="text-slate-400 text-xl max-w-3xl mx-auto">
+        <p className="text-slate-400 text-lg md:text-xl max-w-3xl mx-auto">
           Gestiona tu cuenta, revisa tus pedidos y continúa explorando nuevos videojuegos.
         </p>
 
@@ -193,11 +182,11 @@ export default function Perfil() {
                 Cuenta de usuario
               </p>
 
-              <h2 className="text-5xl font-black mb-4">
+              <h2 className="text-4xl md:text-5xl font-black mb-4">
                 {user?.username || "Usuario"}
               </h2>
 
-              <p className="text-slate-400 text-2xl">
+              <p className="text-slate-400 text-xl md:text-2xl">
                 {user?.email || "usuario@email.com"}
               </p>
 
@@ -293,28 +282,32 @@ export default function Perfil() {
 
             </button>
 
-            <button
-              onClick={accessAdmin}
-              className="bg-slate-950 border border-slate-800 hover:border-cyan-400 transition rounded-3xl p-8 text-left flex justify-between items-center md:col-span-2"
-            >
+            {user?.is_admin && (
 
-              <div>
+              <button
+                onClick={() => navigate("/admin")}
+                className="bg-slate-950 border border-slate-800 hover:border-cyan-400 transition rounded-3xl p-8 text-left flex justify-between items-center md:col-span-2"
+              >
 
-                <h3 className="text-3xl font-black mb-4">
-                  Panel de administración
-                </h3>
+                <div>
 
-                <p className="text-slate-400 text-lg leading-relaxed">
-                  Gestiona estadísticas, ingresos, stock y métricas de GameStore.
-                </p>
+                  <h3 className="text-3xl font-black mb-4">
+                    Panel de administración
+                  </h3>
 
-              </div>
+                  <p className="text-slate-400 text-lg leading-relaxed">
+                    Gestiona estadísticas, ingresos, stock y métricas de GameStore.
+                  </p>
 
-              <span className="text-cyan-400 text-3xl">
-                →
-              </span>
+                </div>
 
-            </button>
+                <span className="text-cyan-400 text-3xl">
+                  →
+                </span>
+
+              </button>
+
+            )}
 
           </div>
 
@@ -332,37 +325,6 @@ export default function Perfil() {
         </div>
 
       </main>
-
-      {modalAdmin && (
-
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-6">
-
-          <div className="bg-slate-900 border border-cyan-500/30 rounded-3xl max-w-md w-full p-8 text-center shadow-2xl shadow-cyan-500/20">
-
-            <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-5xl">
-              🔒
-            </div>
-
-            <h2 className="text-3xl font-black mb-4">
-              Acceso restringido
-            </h2>
-
-            <p className="text-slate-400 text-lg leading-relaxed mb-8">
-              Debes tener permisos de administrador para acceder al panel de control.
-            </p>
-
-            <button
-              onClick={() => setModalAdmin(false)}
-              className="px-8 py-4 rounded-2xl bg-cyan-500 hover:bg-cyan-400 transition text-black font-black text-lg"
-            >
-              Entendido
-            </button>
-
-          </div>
-
-        </div>
-
-      )}
 
       {modalLogout && (
 

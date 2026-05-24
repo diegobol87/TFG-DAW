@@ -12,7 +12,8 @@ export default function Catalogo() {
   const [games, setGames] = useState([]);
   const [filteredGames, setFilteredGames] = useState([]);
   const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState("todos");
+  const [platformFilter, setPlatformFilter] = useState("todos");
+  const [genreFilter, setGenreFilter] = useState("todos");
   const [cartCount, setCartCount] = useState(0);
   const [paginaActual, setPaginaActual] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -32,7 +33,7 @@ export default function Catalogo() {
 
     applyFilters();
 
-  }, [search, filter, games]);
+  }, [search, platformFilter, genreFilter, games]);
 
   async function updateCartCounter() {
 
@@ -123,13 +124,19 @@ export default function Catalogo() {
 
           platform.toLowerCase().includes(texto);
 
-        const matchesFilter =
+        const matchesPlatform =
 
-          filter === "todos" ||
+          platformFilter === "todos" ||
 
-          platform === filter;
+          platform === platformFilter;
 
-        return matchesSearch && matchesFilter;
+        const matchesGenre =
+
+          genreFilter === "todos" ||
+
+          genre.toLowerCase().includes(genreFilter.toLowerCase());
+
+        return matchesSearch && matchesPlatform && matchesGenre;
 
       });
 
@@ -167,6 +174,14 @@ export default function Catalogo() {
 
   }
 
+  function resetFilters() {
+
+    setSearch("");
+    setPlatformFilter("todos");
+    setGenreFilter("todos");
+
+  }
+
   return (
 
     <div className="bg-slate-950 text-white min-h-screen">
@@ -189,7 +204,7 @@ export default function Catalogo() {
 
       </section>
 
-      <section className="max-w-4xl mx-auto px-6 mb-10">
+      <section className="max-w-5xl mx-auto px-6 mb-10">
 
         <input
           type="text"
@@ -201,51 +216,155 @@ export default function Catalogo() {
 
       </section>
 
-      <section className="max-w-7xl mx-auto px-6 mb-16 flex flex-wrap justify-center gap-4">
+      <section className="max-w-7xl mx-auto px-6 mb-8">
 
-        <button
-          onClick={() => setFilter("todos")}
-          className={`px-6 py-3 rounded-2xl font-black transition ${
-            filter === "todos"
-              ? "bg-cyan-400 text-black"
-              : "bg-slate-900 border border-slate-700"
-          }`}
-        >
-          Todos
-        </button>
+        <h2 className="text-center text-cyan-400 font-black tracking-[0.2em] mb-6">
+          FILTRAR POR PLATAFORMA
+        </h2>
 
-        <button
-          onClick={() => setFilter("PC")}
-          className={`px-6 py-3 rounded-2xl font-black transition ${
-            filter === "PC"
-              ? "bg-cyan-400 text-black"
-              : "bg-slate-900 border border-slate-700"
-          }`}
-        >
-          PC
-        </button>
+        <div className="flex flex-wrap justify-center gap-4">
 
-        <button
-          onClick={() => setFilter("PlayStation 5")}
-          className={`px-6 py-3 rounded-2xl font-black transition ${
-            filter === "PlayStation 5"
-              ? "bg-cyan-400 text-black"
-              : "bg-slate-900 border border-slate-700"
-          }`}
-        >
-          PlayStation 5
-        </button>
+          <button
+            onClick={() => setPlatformFilter("todos")}
+            className={`px-6 py-3 rounded-2xl font-black transition ${
+              platformFilter === "todos"
+                ? "bg-cyan-400 text-black"
+                : "bg-slate-900 border border-slate-700"
+            }`}
+          >
+            Todas
+          </button>
 
-        <button
-          onClick={() => setFilter("PlayStation 4")}
-          className={`px-6 py-3 rounded-2xl font-black transition ${
-            filter === "PlayStation 4"
-              ? "bg-cyan-400 text-black"
-              : "bg-slate-900 border border-slate-700"
-          }`}
-        >
-          PlayStation 4
-        </button>
+          <button
+            onClick={() => setPlatformFilter("PC")}
+            className={`px-6 py-3 rounded-2xl font-black transition ${
+              platformFilter === "PC"
+                ? "bg-cyan-400 text-black"
+                : "bg-slate-900 border border-slate-700"
+            }`}
+          >
+            PC
+          </button>
+
+          <button
+            onClick={() => setPlatformFilter("PlayStation 5")}
+            className={`px-6 py-3 rounded-2xl font-black transition ${
+              platformFilter === "PlayStation 5"
+                ? "bg-cyan-400 text-black"
+                : "bg-slate-900 border border-slate-700"
+            }`}
+          >
+            PlayStation 5
+          </button>
+
+          <button
+            onClick={() => setPlatformFilter("PlayStation 4")}
+            className={`px-6 py-3 rounded-2xl font-black transition ${
+              platformFilter === "PlayStation 4"
+                ? "bg-cyan-400 text-black"
+                : "bg-slate-900 border border-slate-700"
+            }`}
+          >
+            PlayStation 4
+          </button>
+
+        </div>
+
+      </section>
+
+      <section className="max-w-7xl mx-auto px-6 mb-16">
+
+        <h2 className="text-center text-cyan-400 font-black tracking-[0.2em] mb-6">
+          FILTRAR POR GÉNERO
+        </h2>
+
+        <div className="flex flex-wrap justify-center gap-4">
+
+          <button
+            onClick={() => setGenreFilter("todos")}
+            className={`px-6 py-3 rounded-2xl font-black transition ${
+              genreFilter === "todos"
+                ? "bg-cyan-400 text-black"
+                : "bg-slate-900 border border-slate-700"
+            }`}
+          >
+            Todos
+          </button>
+
+          <button
+            onClick={() => setGenreFilter("Action")}
+            className={`px-6 py-3 rounded-2xl font-black transition ${
+              genreFilter === "Action"
+                ? "bg-cyan-400 text-black"
+                : "bg-slate-900 border border-slate-700"
+            }`}
+          >
+            Acción
+          </button>
+
+          <button
+            onClick={() => setGenreFilter("Adventure")}
+            className={`px-6 py-3 rounded-2xl font-black transition ${
+              genreFilter === "Adventure"
+                ? "bg-cyan-400 text-black"
+                : "bg-slate-900 border border-slate-700"
+            }`}
+          >
+            Aventura
+          </button>
+
+          <button
+            onClick={() => setGenreFilter("RPG")}
+            className={`px-6 py-3 rounded-2xl font-black transition ${
+              genreFilter === "RPG"
+                ? "bg-cyan-400 text-black"
+                : "bg-slate-900 border border-slate-700"
+            }`}
+          >
+            RPG
+          </button>
+
+          <button
+            onClick={() => setGenreFilter("Shooter")}
+            className={`px-6 py-3 rounded-2xl font-black transition ${
+              genreFilter === "Shooter"
+                ? "bg-cyan-400 text-black"
+                : "bg-slate-900 border border-slate-700"
+            }`}
+          >
+            Shooter
+          </button>
+
+          <button
+            onClick={() => setGenreFilter("Sports")}
+            className={`px-6 py-3 rounded-2xl font-black transition ${
+              genreFilter === "Sports"
+                ? "bg-cyan-400 text-black"
+                : "bg-slate-900 border border-slate-700"
+            }`}
+          >
+            Deportes
+          </button>
+
+          <button
+            onClick={() => setGenreFilter("Racing")}
+            className={`px-6 py-3 rounded-2xl font-black transition ${
+              genreFilter === "Racing"
+                ? "bg-cyan-400 text-black"
+                : "bg-slate-900 border border-slate-700"
+            }`}
+          >
+            Carreras
+          </button>
+
+          <button
+            onClick={resetFilters}
+            className="px-6 py-3 rounded-2xl font-black transition bg-red-500/20 border border-red-500/40 text-red-300 hover:bg-red-500/30"
+          >
+            Limpiar filtros
+          </button>
+
+        </div>
 
       </section>
 
@@ -266,7 +385,7 @@ export default function Catalogo() {
             </h2>
 
             <p className="text-slate-400 text-xl">
-              Prueba con otra búsqueda o cambia el filtro seleccionado.
+              Prueba con otra búsqueda o cambia los filtros seleccionados.
             </p>
 
           </div>

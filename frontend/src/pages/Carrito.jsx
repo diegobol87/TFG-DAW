@@ -38,6 +38,7 @@ export default function Carrito() {
     try {
 
       setLoading(true);
+      setMensaje("");
 
       const response =
         await fetch(API_CART, {
@@ -69,12 +70,14 @@ export default function Carrito() {
 
   }
 
-  async function removeItem(itemId) {
+  async function removeItem(gameId) {
 
     try {
 
+      setMensaje("");
+
       const response =
-        await fetch(`${API_REMOVE}/${itemId}`, {
+        await fetch(`${API_REMOVE}/${gameId}`, {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${token}`
@@ -103,6 +106,8 @@ export default function Carrito() {
 
     try {
 
+      setMensaje("");
+
       const response =
         await fetch(API_CLEAR, {
           method: "DELETE",
@@ -111,8 +116,11 @@ export default function Carrito() {
           }
         });
 
+      const data =
+        await response.json();
+
       if (!response.ok) {
-        throw new Error("Error al vaciar carrito");
+        throw new Error(data.detail || "Error al vaciar carrito");
       }
 
       setCartItems([]);
@@ -139,11 +147,11 @@ export default function Carrito() {
           CARRITO
         </span>
 
-        <h1 className="text-6xl font-black mt-6 mb-6">
+        <h1 className="text-5xl md:text-6xl font-black mt-6 mb-6">
           Tu carrito de compra
         </h1>
 
-        <p className="text-slate-400 text-xl max-w-3xl mx-auto">
+        <p className="text-slate-400 text-lg md:text-xl max-w-3xl mx-auto">
           Revisa los videojuegos seleccionados antes de finalizar tu pedido.
         </p>
 
@@ -169,7 +177,7 @@ export default function Carrito() {
 
           <div className="bg-slate-900 border border-slate-800 rounded-[2rem] p-14 text-center">
 
-            <h2 className="text-5xl font-black mb-6">
+            <h2 className="text-4xl md:text-5xl font-black mb-6">
               El carrito está vacío
             </h2>
 
@@ -203,11 +211,11 @@ export default function Carrito() {
                     className="bg-slate-950 border border-slate-800 rounded-3xl p-6 flex flex-col md:flex-row justify-between items-center gap-6"
                   >
 
-                    <div className="flex items-center gap-6 w-full">
+                    <div className="flex flex-col md:flex-row items-center md:items-start gap-6 w-full text-center md:text-left">
 
                       <img
                         src={game?.image_url || "/assets/images/default.jpg"}
-                        alt={game?.title}
+                        alt={game?.title || "Videojuego"}
                         className="w-32 h-32 object-cover rounded-2xl"
                       />
 
@@ -232,11 +240,11 @@ export default function Carrito() {
                     <div className="flex flex-col md:items-end gap-4">
 
                       <span className="text-4xl font-black text-cyan-400">
-                        {(game?.price * item.quantity).toFixed(2)}€
+                        {((game?.price || 0) * item.quantity).toFixed(2)}€
                       </span>
 
                       <button
-                        onClick={() => removeItem(item.id)}
+                        onClick={() => removeItem(game.id)}
                         className="bg-red-500/20 border border-red-500/40 hover:bg-red-500/30 transition text-red-300 font-bold px-6 py-3 rounded-2xl"
                       >
                         Eliminar
@@ -254,7 +262,7 @@ export default function Carrito() {
 
             <div className="border-t border-slate-700 pt-8 flex flex-col md:flex-row justify-between items-center gap-6">
 
-              <div>
+              <div className="text-center md:text-left">
 
                 <p className="text-slate-400 text-lg mb-2">
                   Total del carrito
@@ -266,7 +274,7 @@ export default function Carrito() {
 
               </div>
 
-              <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
 
                 <button
                   onClick={clearCart}
